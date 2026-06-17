@@ -29,3 +29,8 @@ services:
       - /app/var
     environment:
       XDEBUG_MODE: "off"
+###> doctrine/doctrine-bundle ###
+  database:
+    ports:
+      - "5432"
+###< doctrine/doctrine-bundle ###
