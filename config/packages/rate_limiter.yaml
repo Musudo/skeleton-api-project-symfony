@@ -1,0 +1,8 @@
+framework:
+    rate_limiter:
+        # Sliding window: 100 requests/min per client IP. Storage is the cache.app
+        # pool (filesystem now; it moves to Valkey automatically in Step 7).
+        api:
+            policy: 'sliding_window'
+            limit: 100
+            interval: '1 minute'

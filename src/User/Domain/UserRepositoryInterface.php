@@ -18,4 +18,7 @@ interface UserRepositoryInterface
     public function ofId(Uuid $id): ?User;
 
     public function ofEmail(Email $email): ?User;
+
+    /** @return iterable<User> */
+    public function all(): iterable;
 }

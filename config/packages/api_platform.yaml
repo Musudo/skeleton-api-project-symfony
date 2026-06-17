@@ -1,7 +1,25 @@
 api_platform:
-    title: Hello API Platform
+    title: Skeleton API
     version: 1.0.0
+
+    # Discover #[ApiResource] anywhere under src/ — our resources live in each
+    # context's Presentation/Api folder, not the default src/Entity.
+    mapping:
+        paths:
+            - '%kernel.project_dir%/src'
+
+    formats:
+        jsonld: ['application/ld+json']
+        json: ['application/json']      # let mobile/SPA clients send & receive plain JSON
+
     defaults:
         stateless: true
-        cache_headers:
-            vary: ['Content-Type', 'Authorization', 'Origin']
+        extra_properties:
+            # RFC 7807 / 9457 problem+json error bodies (the 4.x default; explicit here).
+            rfc_7807_compliant_errors: true
+
+    # Map domain exceptions -> HTTP status. API Platform renders them as
+    # application/problem+json. The domain still imports nothing HTTP-related.
+    exception_to_status:
+        App\User\Domain\Exception\InvalidEmail: 422
+        App\User\Domain\Exception\EmailAlreadyInUse: 409

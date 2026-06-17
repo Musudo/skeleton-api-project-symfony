@@ -37,4 +37,9 @@ final readonly class DoctrineUserRepository implements UserRepositoryInterface
     {
         return $this->em->getRepository(User::class)->findOneBy(['email' => (string) $email]);
     }
+
+    public function all(): iterable
+    {
+        return $this->em->getRepository(User::class)->findAll();
+    }
 }
