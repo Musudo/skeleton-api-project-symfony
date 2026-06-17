@@ -1,0 +1,16 @@
+# Production overrides — load with:
+#   docker compose -f compose.yaml -f compose.prod.yaml up -d
+services:
+  php:
+    image: ${IMAGES_PREFIX:-}skeleton-api-php-prod
+    build: { context: ., target: frankenphp_prod }
+    environment:
+      APP_SECRET: ${APP_SECRET}
+      MERCURE_PUBLISHER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET}
+      MERCURE_SUBSCRIBER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET}
+
+  worker:
+    image: ${IMAGES_PREFIX:-}skeleton-api-php-prod
+    build: { context: ., target: frankenphp_prod }
+    environment:
+      APP_SECRET: ${APP_SECRET}

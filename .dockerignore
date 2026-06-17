@@ -1,0 +1,17 @@
+**/*.log
+**/*.md
+**/*.cache
+**/.DS_Store
+**/.git/
+**/.gitignore
+**/compose.*.yaml
+**/compose.yaml
+**/Dockerfile
+.github/
+tests/
+var/
+vendor/
+.env.*.local
+.env.local
+.env.local.php
+.env.test
