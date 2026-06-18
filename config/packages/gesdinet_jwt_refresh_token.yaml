@@ -1,0 +1,7 @@
+gesdinet_jwt_refresh_token:
+    refresh_token_class: App\Entity\RefreshToken
+    # 30-day refresh window. The access token stays short (15 min); this is the long pole.
+    ttl: 2592000
+    # Rotation: each refresh token works once, then a brand-new one is issued. Limits the
+    # blast radius if a refresh token leaks.
+    single_use: true

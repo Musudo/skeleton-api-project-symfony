@@ -23,6 +23,12 @@ security:
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
+        api_token_refresh:
+            pattern: ^/api/v1/token/refresh
+            stateless: true
+            refresh_jwt:
+                check_path: /api/v1/token/refresh
+
         api:
             pattern: ^/api/v1
             stateless: true
@@ -32,6 +38,7 @@ security:
     access_control:
         # First match wins, so public rules come before the catch-all.
         - { path: ^/api/v1/auth, roles: PUBLIC_ACCESS }
+        - { path: ^/api/v1/token/refresh, roles: PUBLIC_ACCESS }
         - { path: ^/api/v1/users, methods: [POST], roles: PUBLIC_ACCESS }   # open registration
         - { path: ^/api/v1, roles: IS_AUTHENTICATED_FULLY }
 

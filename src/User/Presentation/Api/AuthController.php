@@ -16,4 +16,10 @@ final class AuthController
     {
         throw new \LogicException('Intercepted by the json_login authenticator.');
     }
+
+    #[Route('/api/v1/token/refresh', name: 'api_token_refresh', methods: ['POST'])]
+    public function refresh(): never
+    {
+        throw new \LogicException('Intercepted by the refresh_jwt authenticator.');
+    }
 }
