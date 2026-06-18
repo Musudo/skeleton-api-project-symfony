@@ -24,5 +24,7 @@ services:
             - '../src/Kernel.php'
             - '../src/*/Domain/'   # entities, value objects, exceptions: not services
 
-    # Bind domain ports to their infrastructure adapters.
+    # Bind domain ports to their infrastructure adapters. 
+    # These are explicit aliases, so they work even though src/*/Domain/ is excluded from autodiscovery.
+    App\User\Domain\PasswordHasher: '@App\User\Infrastructure\Security\SymfonyPasswordHasher'
     App\User\Domain\UserRepositoryInterface: '@App\User\Infrastructure\Persistence\Doctrine\DoctrineUserRepository'

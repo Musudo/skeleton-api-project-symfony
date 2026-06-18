@@ -31,6 +31,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:write']],
     operations: [
+        new Get(uriTemplate: '/me', uriVariables: [], provider: \App\User\Presentation\Api\State\MeProvider::class),
         new Get(provider: UserItemProvider::class),
         new GetCollection(provider: UserCollectionProvider::class),
         new Post(processor: RegisterUserProcessor::class, status: 201),
@@ -49,6 +50,11 @@ final class UserResource
     #[Groups(['user:read', 'user:write'])]
     public string $email = '';
 
+    #[Assert\NotBlank(groups: ['user:write'])]
+    #[Assert\Length(min: 8)]
+    #[Groups(['user:write'])]   // accepted on POST, NEVER serialized back out
+    public ?string $password = null;
+
     /** @var list<string> */
     #[Groups(['user:read'])]
     public array $roles = [];
@@ -61,7 +67,7 @@ final class UserResource
         $r = new self();
         $r->id = $user->id();
         $r->email = $user->email();
-        $r->roles = $user->roles();
+        $r->roles = $user->getRoles();
         $r->createdAt = $user->createdAt();
 
         return $r;

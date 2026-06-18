@@ -34,7 +34,7 @@ final class RegisterUserCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $id = ($this->handler)(new RegisterUser($input->getArgument('email')));
+        $id = ($this->handler)(new RegisterUser($input->getArgument('email'), $input->getArgument('password')));
         $io->success(sprintf('User registered with id %s', $id));
 
         return Command::SUCCESS;

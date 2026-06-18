@@ -7,12 +7,13 @@ namespace App\User\Domain;
 use App\Shared\Domain\AbstractEntity;
 use App\User\Domain\ValueObject\Email;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity]
-// "user" is a reserved word in PostgreSQL — name the table explicitly.
 #[ORM\Table(name: 'users')]
-class User extends AbstractEntity
+class User extends AbstractEntity implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Column(type: 'string', length: 180, unique: true)]
     private string $email;
@@ -21,19 +22,20 @@ class User extends AbstractEntity
     #[ORM\Column(type: 'json')]
     private array $roles;
 
+    // Stores the ALREADY-hashed password. Hashing happens in Infrastructure via a
+    // domain port, so the domain never imports Symfony's hasher.
+    #[ORM\Column(type: 'string')]
+    private string $passwordHash;
+
     #[ORM\Column(type: 'datetime_immutable')]
     private \DateTimeImmutable $createdAt;
 
-    /**
-     * Takes an Email value object, so a User can never be built from an invalid
-     * address; it is persisted as a plain column. Credentials/auth arrive in Step 6.
-     *
-     * @param list<string> $roles
-     */
-    public function __construct(Email $email, array $roles = ['ROLE_USER'], ?Uuid $id = null)
+    /** @param list<string> $roles */
+    public function __construct(Email $email, string $passwordHash, array $roles = ['ROLE_USER'], ?Uuid $id = null)
     {
-        parent::__construct($id);            // mints a UUIDv7 if none supplied
+        parent::__construct($id);
         $this->email = (string) $email;
+        $this->passwordHash = $passwordHash;
         $this->roles = $roles;
         $this->createdAt = new \DateTimeImmutable();
     }
@@ -43,14 +45,33 @@ class User extends AbstractEntity
         return $this->email;
     }
 
-    /** @return list<string> */
-    public function roles(): array
-    {
-        return $this->roles;
-    }
-
     public function createdAt(): \DateTimeImmutable
     {
         return $this->createdAt;
     }
+
+    // --- Symfony Security contracts ---
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
+    }
+
+    /** @return list<string> */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        $roles[] = 'ROLE_USER';   // every user is at least ROLE_USER
+
+        return array_values(array_unique($roles));
+    }
+
+    public function getPassword(): string
+    {
+        return $this->passwordHash;
+    }
+
+    // Note: Symfony 8 REMOVED eraseCredentials() from UserInterface (we store no
+    // plaintext, so there's nothing to erase). If you ever see an error naming it,
+    // add a public no-op eraseCredentials(): void {}.
 }
