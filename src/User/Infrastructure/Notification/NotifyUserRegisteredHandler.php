@@ -7,9 +7,9 @@ namespace App\User\Infrastructure\Notification;
 use App\User\Application\Notification\NotifyUserRegistered;
 use App\User\Domain\UserRepositoryInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Uid\Uuid;
 
 #[AsMessageHandler]

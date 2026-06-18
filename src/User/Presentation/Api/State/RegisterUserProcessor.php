@@ -30,7 +30,9 @@ final readonly class RegisterUserProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): UserResource
     {
         $id = ($this->handler)(new RegisterUser($data->email, (string) $data->password));
+        $user = $this->users->ofId($id);
+        \assert(null !== $user);
 
-        return UserResource::fromDomain($this->users->ofId($id));
+        return UserResource::fromDomain($user);
     }
 }

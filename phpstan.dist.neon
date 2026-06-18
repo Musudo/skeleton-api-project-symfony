@@ -1,0 +1,16 @@
+parameters:
+    level: max
+    paths:
+        - src
+        - tests
+    # phpstan-symfony reads the compiled container to understand your services.
+    symfony:
+        containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
+    # ... existing paths + symfony block ...
+    ignoreErrors:
+        # Framework entry point Symfony calls reflectively — PHPStan can't see the call.
+        - identifier: method.unused
+          path: src/Kernel.php
+        # test-pack's generated bootstrap; intentional defensive guard.
+        - identifier: function.alreadyNarrowedType
+          path: tests/bootstrap.php

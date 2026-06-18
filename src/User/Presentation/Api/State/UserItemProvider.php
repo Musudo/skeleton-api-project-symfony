@@ -24,7 +24,7 @@ final readonly class UserItemProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?UserResource
     {
         $id = $uriVariables['id'];
-        $id = $id instanceof Uuid ? $id : Uuid::fromString((string) $id);
+        $id = $id instanceof Uuid ? $id : Uuid::fromString(\is_string($id) ? $id : '');
 
         $user = $this->users->ofId($id);
 

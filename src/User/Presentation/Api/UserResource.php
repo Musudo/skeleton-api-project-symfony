@@ -31,7 +31,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:write']],
     operations: [
-        new Get(uriTemplate: '/me', uriVariables: [], provider: \App\User\Presentation\Api\State\MeProvider::class),
+        new Get(uriTemplate: '/me', uriVariables: [], provider: State\MeProvider::class),
         new Get(provider: UserItemProvider::class),
         new GetCollection(provider: UserCollectionProvider::class),
         new Post(processor: RegisterUserProcessor::class, status: 201),
@@ -52,7 +52,7 @@ final class UserResource
 
     #[Assert\NotBlank(groups: ['user:write'])]
     #[Assert\Length(min: 8)]
-    #[Groups(['user:write'])]   // accepted on POST, NEVER serialized back out
+    #[Groups(['user:write'])] // accepted on POST, NEVER serialized back out
     public ?string $password = null;
 
     /** @var list<string> */

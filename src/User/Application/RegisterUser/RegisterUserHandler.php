@@ -20,7 +20,7 @@ final readonly class RegisterUserHandler
     ) {
     }
 
-    public function __invoke(RegisterUser $command): \Symfony\Component\Uid\Uuid
+    public function __invoke(RegisterUser $command): Uuid
     {
         $email = new Email($command->email);
         if (null !== $this->users->ofEmail($email)) {

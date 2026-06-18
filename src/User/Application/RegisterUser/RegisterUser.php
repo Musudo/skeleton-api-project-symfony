@@ -10,7 +10,7 @@ namespace App\User\Application\RegisterUser;
  */
 final readonly class RegisterUser
 {
-     public function __construct(
+    public function __construct(
         public string $email,
         public string $password,
     ) {

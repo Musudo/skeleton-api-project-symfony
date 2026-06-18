@@ -19,9 +19,14 @@ final class RegisterUserHandlerTest extends TestCase
 {
     public function testRegistersHashesAndDispatches(): void
     {
+        $saved = null;
+
         $repo = $this->createMock(UserRepositoryInterface::class);
         $repo->method('ofEmail')->willReturn(null);
-        $repo->expects(self::once())->method('save');
+        $repo->expects(self::once())->method('save')
+            ->willReturnCallback(function (User $user) use (&$saved): void {
+                $saved = $user;
+            });
 
         $hasher = $this->createMock(PasswordHasher::class);
         $hasher->expects(self::once())->method('hash')->with('secret123')->willReturn('hashed');
@@ -31,7 +36,9 @@ final class RegisterUserHandlerTest extends TestCase
 
         $id = (new RegisterUserHandler($repo, $hasher, $bus))(new RegisterUser('new@example.com', 'secret123'));
 
-        self::assertNotNull($id);
+        self::assertInstanceOf(User::class, $saved);
+        self::assertSame('new@example.com', $saved->email());
+        self::assertTrue($id->equals($saved->id()));
     }
 
     public function testRejectsDuplicateEmail(): void

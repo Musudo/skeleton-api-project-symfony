@@ -22,8 +22,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[ORM\Column(type: 'json')]
     private array $roles;
 
-    // Stores the ALREADY-hashed password. Hashing happens in Infrastructure via a
-    // domain port, so the domain never imports Symfony's hasher.
     #[ORM\Column(type: 'string')]
     private string $passwordHash;
 
@@ -54,6 +52,11 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
 
     public function getUserIdentifier(): string
     {
+        // The Email value object guarantees a non-empty, validated address, but that
+        // guarantee is lost once Doctrine hydrates it into a plain string property.
+        // The assert re-narrows it to satisfy UserInterface's non-empty-string contract.
+        \assert('' !== $this->email);
+
         return $this->email;
     }
 
@@ -61,7 +64,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     public function getRoles(): array
     {
         $roles = $this->roles;
-        $roles[] = 'ROLE_USER';   // every user is at least ROLE_USER
+        $roles[] = 'ROLE_USER';
 
         return array_values(array_unique($roles));
     }
@@ -71,7 +74,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         return $this->passwordHash;
     }
 
-    // Note: Symfony 8 REMOVED eraseCredentials() from UserInterface (we store no
-    // plaintext, so there's nothing to erase). If you ever see an error naming it,
-    // add a public no-op eraseCredentials(): void {}.
+    // Note: Symfony 8 removed eraseCredentials() from UserInterface — we store no
+    // plaintext, so there's nothing to erase.
 }

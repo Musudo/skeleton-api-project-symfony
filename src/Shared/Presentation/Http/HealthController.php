@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
  * /health/ready  — readiness: can it actually serve traffic? Probes the request-path
  *                  dependencies (DB, cache). Returns 503 if any are down, so a load
  *                  balancer stops routing here. (RabbitMQ is a worker-path dep, monitored
- *                  separately — the API can still serve reads/writes if it's down.)
+ *                  separately — the API can still serve reads/writes if it's down.).
  *
  * Both live outside /api/v1, so no firewall and no rate limiter apply.
  */
