@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    name: Style, analysis & tests
+    runs-on: ubuntu-latest
+
+    services:
+      database:
+        image: postgres:18.4
+        env:
+          POSTGRES_DB: app
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: '!ChangeMe!'
+        ports: ['5432:5432']
+        # Wait until Postgres answers before the job's steps run.
+        options: >-
+          --health-cmd "pg_isready -U app -d app"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+
+      rabbitmq:
+        image: rabbitmq:4-management-alpine
+        env:
+          RABBITMQ_DEFAULT_USER: app
+          RABBITMQ_DEFAULT_PASS: '!ChangeMe!'
+        ports: ['5672:5672']
+        options: >-
+          --health-cmd "rabbitmq-diagnostics -q ping"
+          --health-interval 15s --health-timeout 10s --health-retries 5
+
+    env:
+      # Point the app at the service containers (reachable on localhost from the runner).
+      DATABASE_URL: 'postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=18.4&charset=utf8'
+      MESSENGER_TRANSPORT_DSN: 'amqp://app:!ChangeMe!@127.0.0.1:5672/%2f/messages'
+      APP_ENV: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: ctype, iconv, intl, pdo_pgsql, amqp, redis, zip, opcache
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Generate JWT keys
+        run: php bin/console lexik:jwt:generate-keypair --skip-if-exists
+
+      - name: Code style (PHP-CS-Fixer)
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff
+
+      - name: Static analysis (PHPStan)
+        run: |
+          php bin/console cache:warmup
+          vendor/bin/phpstan analyse --memory-limit=512M
+
+      - name: Create test database & run migrations
+        run: |
+          php bin/console doctrine:database:create --if-not-exists --env=test
+          php bin/console doctrine:migrations:migrate --no-interaction --env=test
+
+      - name: Tests (PHPUnit)
+        run: vendor/bin/phpunit
