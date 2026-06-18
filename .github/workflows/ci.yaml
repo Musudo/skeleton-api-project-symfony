@@ -68,7 +68,7 @@ jobs:
 
       - name: Static analysis (PHPStan)
         run: |
-          php bin/console cache:warmup
+          APP_ENV=dev php bin/console cache:warmup
           vendor/bin/phpstan analyse --memory-limit=512M
 
       - name: Create test database & run migrations
