@@ -28,3 +28,5 @@ services:
     # These are explicit aliases, so they work even though src/*/Domain/ is excluded from autodiscovery.
     App\User\Domain\PasswordHasher: '@App\User\Infrastructure\Security\SymfonyPasswordHasher'
     App\User\Domain\UserRepositoryInterface: '@App\User\Infrastructure\Persistence\Doctrine\DoctrineUserRepository'
+    App\Shared\Infrastructure\Logging\CorrelationIdProcessor:
+        tags: [{ name: monolog.processor }]

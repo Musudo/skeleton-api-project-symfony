@@ -21,6 +21,11 @@ framework:
         routing:
             App\User\Application\Notification\NotifyUserRegistered: async
 
+        buses:
+            messenger.bus.default:
+                middleware:
+                    - 'App\Shared\Infrastructure\Messenger\CorrelationIdMiddleware'
+
 # Tests run without RabbitMQ: route async messages to an in-memory transport so the
 # suite is fast and side effects don't actually fire. Enable this in Step 9.
 #when@test:
