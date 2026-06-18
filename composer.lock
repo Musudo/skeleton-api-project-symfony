@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b1fa130c052f4b48b2bfc81c1cd244a7",
+    "content-hash": "9fec3a0399cead2ddaae649c9bbc136d",
     "packages": [
         {
             "name": "api-platform/doctrine-common",
@@ -9157,53 +9157,6 @@
                 "source": "https://github.com/phar-io/version/tree/3.2.1"
             },
             "time": "2022-02-21T01:04:05+00:00"
-        },
-        {
-            "name": "php-cs-fixer/shim",
-            "version": "v3.9.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/PHP-CS-Fixer/shim.git",
-                "reference": "9014ca3ab81b3d73ab22ffdeaf236071db9a047c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/shim/zipball/9014ca3ab81b3d73ab22ffdeaf236071db9a047c",
-                "reference": "9014ca3ab81b3d73ab22ffdeaf236071db9a047c",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "ext-tokenizer": "*",
-                "php": "^7.4 || ^8.0"
-            },
-            "suggest": {
-                "ext-dom": "For handling output formats in XML",
-                "ext-mbstring": "For handling non-UTF8 characters."
-            },
-            "bin": [
-                "php-cs-fixer"
-            ],
-            "type": "application",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Dariusz Rumiński",
-                    "email": "dariusz.ruminski@gmail.com"
-                }
-            ],
-            "description": "A tool to automatically fix PHP code style",
-            "support": {
-                "source": "https://github.com/PHP-CS-Fixer/shim/tree/v3.9.3"
-            },
-            "time": "2022-07-13T10:02:07+00:00"
         },
         {
             "name": "phpstan/extension-installer",
