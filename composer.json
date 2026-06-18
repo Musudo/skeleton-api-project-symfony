@@ -1,4 +1,6 @@
 {
+    "name": "your-vendor/skeleton-api-project-symfony",
+    "description": "Reusable Symfony 8.1 backend API skeleton (PHP 8.4, API Platform 4.3, PostgreSQL 18.4).",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "stable",
