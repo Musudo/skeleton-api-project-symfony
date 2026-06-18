@@ -1,19 +1,18 @@
 framework:
     cache:
-        # Unique name of your app: used to compute stable namespaces for cache keys.
-        #prefix_seed: your_vendor_name/app_name
+        # The "app" pool is your general-purpose cache (rate-limiter counters, Doctrine
+        # result/query caches in prod, anything you store via CacheInterface).
+        # Backed by Valkey, which speaks the Redis protocol — the php-redis extension
+        # connects to it unchanged. REDIS_URL is injected by Compose (redis://cache:6379).
+        app: cache.adapter.redis
+        default_redis_provider: '%env(REDIS_URL)%'
 
-        # The "app" cache stores to the filesystem by default.
-        # The data in this cache should persist between deploys.
-        # Other options include:
+        # The "system" pool (compiled container, annotation/validation metadata) is left
+        # on its default local adapter on purpose — it's deploy-local and faster local.
 
-        # Redis
-        #app: cache.adapter.redis
-        #default_redis_provider: redis://localhost
+        # Optional: set a stable seed so cache keys don't collide across apps sharing a Valkey.
+        #prefix_seed: skeleton-api/app
 
-        # APCu (not recommended with heavy random-write workloads as memory fragmentation can cause perf issues)
-        #app: cache.adapter.apcu
-
-        # Namespaced pools use the above "app" backend by default
+        # Dedicated pools (if you ever want one isolated from "app"):
         #pools:
-            #my.dedicated.cache: null
+        #    my.dedicated.cache: null

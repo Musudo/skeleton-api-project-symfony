@@ -16,19 +16,21 @@ final readonly class RegisterUserHandler
     public function __construct(
         private UserRepositoryInterface $users,
         private PasswordHasher $hasher,
+        private \Symfony\Component\Messenger\MessageBusInterface $bus,
     ) {
     }
 
-    public function __invoke(RegisterUser $command): Uuid
+    public function __invoke(RegisterUser $command): \Symfony\Component\Uid\Uuid
     {
         $email = new Email($command->email);
-
         if (null !== $this->users->ofEmail($email)) {
             throw new EmailAlreadyInUse($email);
         }
-
         $user = new User($email, $this->hasher->hash($command->password));
         $this->users->save($user);
+
+        // Hand the side effect to RabbitMQ — the HTTP response doesn't wait for it.
+        $this->bus->dispatch(new \App\User\Application\Notification\NotifyUserRegistered((string) $user->id()));
 
         return $user->id();
     }

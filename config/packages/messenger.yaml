@@ -1,0 +1,30 @@
+framework:
+    messenger:
+        # Messages that exhaust their retries land in the "failed" transport below
+        # instead of being dropped. REQUIRED for the dead-letter queue to work.
+        failure_transport: failed
+
+        transports:
+            # Async work -> RabbitMQ (AMQP). Consumed by the `worker` container.
+            async:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                retry_strategy:
+                    max_retries: 3
+                    delay: 1000      # backoff: 1s, then 2s, then 4s
+                    multiplier: 2
+
+            # Dead-letter queue: messages that fail all retries are stored here (durable,
+            # inspectable via `bin/console messenger:failed:show`). Backed by a Doctrine
+            # table that's auto-created on first use.
+            failed: 'doctrine://default?queue_name=failed'
+
+        routing:
+            App\User\Application\Notification\NotifyUserRegistered: async
+
+# Tests run without RabbitMQ: route async messages to an in-memory transport so the
+# suite is fast and side effects don't actually fire. Enable this in Step 9.
+#when@test:
+#    framework:
+#        messenger:
+#            transports:
+#                async: 'in-memory://'
