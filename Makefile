@@ -17,3 +17,5 @@ ps: ## Service status
 	$(DC) ps
 worker: ## Start the Messenger worker (enable after Step 7)
 	$(DC) --profile worker up -d worker
+test: ## Run the full test suite
+	$(DC) exec -T php vendor/bin/phpunit

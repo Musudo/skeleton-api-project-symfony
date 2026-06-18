@@ -27,9 +27,9 @@ framework:
                     - 'App\Shared\Infrastructure\Messenger\CorrelationIdMiddleware'
 
 # Tests run without RabbitMQ: route async messages to an in-memory transport so the
-# suite is fast and side effects don't actually fire. Enable this in Step 9.
-#when@test:
-#    framework:
-#        messenger:
-#            transports:
-#                async: 'in-memory://'
+# suite is fast and side effects don't actually fire
+when@test:
+   framework:
+       messenger:
+           transports:
+               async: 'in-memory://'

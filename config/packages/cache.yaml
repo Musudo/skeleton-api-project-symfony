@@ -8,11 +8,18 @@ framework:
         default_redis_provider: '%env(REDIS_URL)%'
 
         # The "system" pool (compiled container, annotation/validation metadata) is left
-        # on its default local adapter on purpose — it's deploy-local and faster local.
+        # on its default local adapter on purpose — it's deploy-local and faster.
 
-        # Optional: set a stable seed so cache keys don't collide across apps sharing a Valkey.
+        # Optional: stable seed so cache keys don't collide across apps sharing a Valkey.
         #prefix_seed: skeleton-api/app
 
         # Dedicated pools (if you ever want one isolated from "app"):
         #pools:
         #    my.dedicated.cache: null
+
+# Tests use an in-process array cache: no Valkey dependency, and rate-limiter
+# counters reset each run so they can't bleed between tests.
+when@test:
+    framework:
+        cache:
+            app: cache.adapter.array
