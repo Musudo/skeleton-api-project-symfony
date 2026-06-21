@@ -140,6 +140,47 @@ The skeleton ships one fully wired bounded context — **`User`** — through ev
 
 ---
 
+## First run after cloning
+
+A fresh clone is missing the things that are (correctly) gitignored — `vendor/`, the JWT keys, and any local `.env.local`. The stack regenerates most of it on first boot, but two steps are manual. Run these once after cloning:
+
+```bash
+make up
+```
+
+The first `make up` is slow: it builds the image and the entrypoint runs `composer install` (vendors aren't in git) before the app comes healthy. Wait for all four services to report healthy:
+
+```bash
+docker compose ps
+```
+
+Then generate the JWT signing keys — **required**, and one-time per clone (`config/jwt/` is gitignored because the keys are secrets):
+
+```bash
+docker compose exec php php bin/console lexik:jwt:generate-keypair
+```
+
+The database schema is applied automatically by the entrypoint on boot, but confirm it actually ran:
+
+```bash
+docker compose exec php php bin/console doctrine:migrations:status
+```
+
+If it shows pending migrations, apply them:
+
+```bash
+docker compose exec php php bin/console doctrine:migrations:migrate --no-interaction
+```
+
+You're up: <https://localhost/api> (Swagger), <https://localhost/health> (health check).
+
+> **Notes**
+> - The stack boots with the throwaway dev credentials baked into `compose.yaml` (`!ChangeMe!`, the dev Mercure/JWT secrets). Any customizations you made in `.env.local` are *not* in the clone — recreate them if needed.
+> - If ports 80/443 are taken on your machine, set `HTTP_PORT` / `HTTPS_PORT` in a `.env.local` and re-run `make up`.
+> - Running tests for the first time? The `app_test` database is separate — create and migrate it once (see [Testing & quality](#testing--quality)).
+
+---
+
 ## Getting started
 
 **Prerequisites:** Docker + Docker Compose. (Local PHP 8.4 is only needed if you scaffold outside the container.)
