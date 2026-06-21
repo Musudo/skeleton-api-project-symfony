@@ -9,7 +9,8 @@ help: ## List targets
 ## — Stack —
 
 up: ## Build & start the dev stack, waiting for healthchecks
-	$(DC) up -d --build --wait
+	$(DC) up -d --build --wait database cache rabbitmq php
+	$(DC) up -d worker
 
 down: ## Stop and remove the stack
 	$(DC) down --remove-orphans
