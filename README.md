@@ -140,7 +140,45 @@ The skeleton ships one fully wired bounded context — **`User`** — through ev
 
 ---
 
-## First run after cloning
+## Getting started
+
+**Prerequisites:** Docker + Docker Compose. (Local PHP 8.4 is only needed if you scaffold outside the container.)
+
+```bash
+make up                       # build & start php, database, cache, rabbitmq
+make worker                   # start the Messenger worker
+```
+
+Then:
+
+- API docs (Swagger UI): <https://localhost/api> — accept the self-signed cert
+- OpenAPI spec: <https://localhost/api/docs.json>
+- RabbitMQ management: <http://localhost:15672> (default `app` / `!ChangeMe!`)
+- Health: <https://localhost/health> and <https://localhost/health/ready>
+
+First-run auth setup (JWT signing keys; `config/jwt/` is gitignored):
+
+```bash
+docker compose exec php php bin/console lexik:jwt:generate-keypair
+```
+
+### Make targets
+
+| Target | Description |
+|---|---|
+| `make up` | Build & start the dev stack (waits for healthchecks) |
+| `make down` | Stop and remove the stack |
+| `make worker` | Start the Messenger worker |
+| `make sh` | Shell into the php container |
+| `make logs` | Tail all logs |
+| `make test` | Run the full test suite |
+| `make stan` | Static analysis (PHPStan, level max) |
+| `make cs-fix` | Auto-fix code style |
+| `make cs-check` | Check code style without modifying files |
+
+---
+
+### Backup flow for the first run (in case previous attempt failed)
 
 A fresh clone is missing the things that are (correctly) gitignored — `vendor/`, the JWT keys, and any local `.env.local`. The stack regenerates most of it on first boot, but two steps are manual. Run these once after cloning:
 
@@ -178,44 +216,6 @@ You're up: <https://localhost/api> (Swagger), <https://localhost/health> (health
 > - The stack boots with the throwaway dev credentials baked into `compose.yaml` (`!ChangeMe!`, the dev Mercure/JWT secrets). Any customizations you made in `.env.local` are *not* in the clone — recreate them if needed.
 > - If ports 80/443 are taken on your machine, set `HTTP_PORT` / `HTTPS_PORT` in a `.env.local` and re-run `make up`.
 > - Running tests for the first time? The `app_test` database is separate — create and migrate it once (see [Testing & quality](#testing--quality)).
-
----
-
-## Getting started
-
-**Prerequisites:** Docker + Docker Compose. (Local PHP 8.4 is only needed if you scaffold outside the container.)
-
-```bash
-make up                       # build & start php, database, cache, rabbitmq
-make worker                   # start the Messenger worker
-```
-
-Then:
-
-- API docs (Swagger UI): <https://localhost/api> — accept the self-signed cert
-- OpenAPI spec: <https://localhost/api/docs.json>
-- RabbitMQ management: <http://localhost:15672> (default `app` / `!ChangeMe!`)
-- Health: <https://localhost/health> and <https://localhost/health/ready>
-
-First-run auth setup (JWT signing keys; `config/jwt/` is gitignored):
-
-```bash
-docker compose exec php php bin/console lexik:jwt:generate-keypair
-```
-
-### Make targets
-
-| Target | Description |
-|---|---|
-| `make up` | Build & start the dev stack (waits for healthchecks) |
-| `make down` | Stop and remove the stack |
-| `make worker` | Start the Messenger worker |
-| `make sh` | Shell into the php container |
-| `make logs` | Tail all logs |
-| `make test` | Run the full test suite |
-| `make stan` | Static analysis (PHPStan, level max) |
-| `make cs-fix` | Auto-fix code style |
-| `make cs-check` | Check code style without modifying files |
 
 ---
 
@@ -365,9 +365,3 @@ This skeleton favors pragmatism over architectural purity in a few places. Each 
 - The **prod image** (`compose.prod.yaml`, `frankenphp_prod` target) runs as a non-root user. An even leaner distroless variant is available in the upstream Symfony Docker template if image size matters.
 - The Messenger **`failed` (dead-letter) transport** auto-creates its `messenger_messages` table on first use. For production you may prefer `auto_setup: false` plus an explicit migration.
 - Logs are emitted as **structured JSON to stderr in prod** — point your aggregator at the container's stderr; each line carries `extra.correlation_id`.
-
----
-
-## License
-
-Proprietary — adjust to your needs.
